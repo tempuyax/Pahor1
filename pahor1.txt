@@ -1,0 +1,388 @@
+
+### BUG1: ###
+2019
+====================================
+27 Sep
+(1)
+Mengunakan Objek XMenu
+(2)
+mengaktifkan checkbox 
+====================================
+26 Sep
+(1)
+Terjadi secara tak sengaja mode text yg tersimpan menjadi
+format widecharacter, Compiler ML.exe tdk bisa membaca
+*.asm. tdk tahu disebabkan apa?
+
+(2)
+pd objek Dialog, nilai hWnd nya tidak dapat diketahui/ hWnd=0
+
+#Mengeset Pointer Object & Menjalankan Accsesor
+    SetObject esi   ; Pointer Object mengarah ke block data nya sendiri
+    ACall esi.Init	; Accsesor dijalankan jika sama2 Init
+
+
+#Cara memanggil Iterface COM
+      ICall [esi].pAgentChar::IAgentCharacterEx.Play, ecx, addr dReqID
+
+#Menerima Pointer dari Interface
+Lihat parameter : addr [esi].pAgentChar
+      ICall [esi].pAgent::IAgentEx.GetCharacterEx, [esi].dCharID, addr [esi].pAgentChar
+
+#menyimpan nilai ke object
+
+            mov ebx, [esi].pXMenu
+
+#mengambil nilai dari object lain
+lihat parameter : [ebx].XMenu.hMenu
+
+            Invoke CheckMenuItem, [ebx].XMenu.hMenu, IDM_ASST, [esi].fChek
+
+
+IIDFromString PROTO STDCALL :DWORD,:DWORD
+IsAccelerator PROTO STDCALL :DWORD,:DWORD,:DWORD,:DWORD
+IsEqualGUID PROTO STDCALL :DWORD,:DWORD
+IsValidIid PROTO STDCALL :DWORD
+IsValidInterface PROTO STDCALL :DWORD
+IsValidPtrIn PROTO STDCALL :DWORD,:DWORD
+IsValidPtrOut PROTO STDCALL :DWORD,:DWORD
+
+
+
+#Membuat Password
+Function		Description
+CryptDeriveKey	Create a key derived from a password.
+CryptGenKey		Create a random key.
+
+Algorithm		Description
+CAST			This is a 64-bit symmetric block cipher developed by C. M. Adams and S. E. Tavares. This algorithm is somewhat similar to DES (Data Encryption Standard).
+DES				National Institute of Standards and Technology (NIST) Data Encryption Standard. This is a 64-bit symmetric block cipher that has a fixed key length of 56-bits.
+DH				Diffie-Hellman. This is a public-key algorithm used for secure key exchange. It cannot be used for data encryption.
+DSS				Digital Signature Standard. This standard uses the Digital Signature Algorithm (DSA), which is a public-key cipher used to generate digital signatures. It cannot be used for data encryption.
+KEA				Key Exchange Algorithm. This is an improved version of Diffie-Hellman.
+MD2				MD2. This is a hashing algorithm that produces a 128-bit hash value.
+MD4				MD4. This is a hashing algorithm that produces a 128-bit hash value.
+MD5				MD5. This is an improved version of MD4. It also produces a 128-bit hash value.
+RC2				RC2 Block Cipher. This is a 64-bit symmetric block cipher.
+RC4				RC4 Stream Cipher. This is a symmetric stream cipher.
+RSA				RSA Public-Key Cipher. This is a popular public-key cipher used for both encryption and signatures.
+SHA				Secure Hash Algorithm. This is a hashing algorithm that produces a 160-bit hash value.
+Skipjack		This is the algorithm used by the Clipper and Capstone chips. It is a symmetric block cipher with a fixed key length of 80 bits.
+
+Example:
+
+#include <wincrypt.h>
+  
+HCRYPTPROV hProv = 0;
+HCRYPTKEY hKey = 0;
+HCRYPTHASH hHash = 0;
+CHAR szPassword[ ] = "apple-camshaft";
+DWORD dwLength;
+
+// Get handle to user default provider.
+if(!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, 0)) {
+    printf("Error %x during CryptAcquireContext!\n", GetLastError());
+    goto done;
+}
+
+// Create hash object.
+if(!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash)) {
+    printf("Error %x during CryptCreateHash!\n", GetLastError());
+
+    goto done;
+}
+
+// Hash password string.
+dwLength = strlen(szPassword);
+if(!CryptHashData(hHash, (BYTE *)szPassword, dwLength, 0)) {
+    printf("Error %x during CryptHashData!\n", GetLastError());
+    goto done;
+}
+
+// Create block cipher session key based on hash of the password.
+if(!CryptDeriveKey(hProv, CALG_RC2, hHash, CRYPT_EXPORTABLE, &hKey)) {
+    printf("Error %x during CryptDeriveKey!\n", GetLastError());
+    goto done;
+}
+
+// Use 'hKey' to do something.
+
+...
+  
+done:
+
+// Destroy hash object.
+if(hHash != 0) CryptDestroyHash(hHash);
+
+// Destroy session key.
+if(hKey != 0) CryptDestroyKey(hKey);
+
+// Release provider handle.
+if(hProv != 0) CryptReleaseContext(hProv, 0);
+
+;===========================================
+
+Example
+
+#include <wincrypt.h>
+ 
+HCRYPTPROV hProv = 0;
+BYTE pbData[1000];
+DWORD dwDataLen;
+
+// Get handle to the default PROV_RSA_FULL provider.
+if(!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, 0)) {
+    printf("Error %x during CryptAcquireContext!\n", GetLastError());
+    return;
+}
+
+// Read the name of the default CSP.
+dwDataLen = 1000;
+if(!CryptGetProvParam(hProv, PP_NAME, pbData, &dwDataLen, 0)) {
+    printf("Error %x reading CSP name!\n", GetLastError());
+
+    return;
+}
+printf("Provider name:%s\n", pbData);
+
+// Read the name of the default key container.
+dwDataLen = 1000;
+if(!CryptGetProvParam(hProv, PP_CONTAINER, pbData, &dwDataLen, 0)) {
+    printf("Error %x reading key container name!\n", GetLastError());
+    return;
+}
+printf("Key Container name:%s\n", pbData);
+
+// Perform cryptographic operations.
+...
+
+// Release provider handle.
+if(!CryptReleaseContext(hProv, 0)) {
+    printf("Error %x during CryptReleaseContext!\n", GetLastError());
+
+    return;
+}
+
+// ****************************************************************
+
+// Get handle to the Microsoft RSA Base Provider and the 
+// "Foo" key container.
+if(!CryptAcquireContext(&hProv, TEXT("Foo"), MS_DEF_PROV, 
+                        PROV_RSA_FULL, 0)) {
+    printf("Error %x during CryptAcquireContext!\n", GetLastError());
+    return;
+}
+
+// Perform cryptographic operations.
+...
+
+// Release provider handle.
+if(!CryptReleaseContext(hProv, 0)) {
+
+    printf("Error %x during CryptReleaseContext!\n", GetLastError());
+    return;
+}
+
+// ****************************************************************
+
+// Get handle to the default provider. Create a new key container 
+// named "Bar". Note that this key container will be empty until keys
+// are explicitly created with the CryptGenKey function.
+lstrcpy(szProv, );
+lstrcpy(szContainer, );
+if(!CryptAcquireContext(&hProv, TEXT("Bar"), NULL, PROV_RSA_FULL,
+                        CRYPT_NEWKEYSET)) {
+
+    printf("Error %x during CryptAcquireContext!\n", GetLastError());
+    return;
+}
+
+// Perform cryptographic operations.
+...
+
+// Release provider handle.
+if(!CryptReleaseContext(hProv, 0)) {
+    printf("Error %x during CryptReleaseContext!\n", GetLastError());
+    return;
+}
+
+;=============================================================
+
+Example
+
+#include <wincrypt.h>
+  
+HCRYPTPROV hProv = 0;
+HCRYPTKEY hKey = 0;
+
+// Get handle to user default provider.
+if(!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, 0)) {
+    printf("Error %x during CryptAcquireContext!\n", GetLastError());
+    goto done;
+}
+
+// Create block cipher session key.
+if(!CryptGenKey(hProv, CALG_RC2, CRYPT_EXPORTABLE, &hKey)) {
+    printf("Error %x during CryptGenKey!\n", GetLastError());
+    goto done;
+}
+
+// Use 'hKey' to do something.
+
+...
+  
+done:
+
+// Destroy session key.
+if(hKey != 0) CryptDestroyKey(hKey);
+
+// Release provider handle.
+if(hProv != 0) CryptReleaseContext(hProv, 0);
+
+;=========================================================
+Example
+
+#include <wincrypt.h>
+ 
+FILE *hSourceFile = NULL;
+HCRYPTPROV hProv = 0;
+HCRYPTKEY hKey = 0;
+BYTE *pbKeyBlob = NULL;
+DWORD dwBlobLen;
+
+// Open file, getting file handle 'hSourceFile'.
+...
+ 
+// Get handle to the default provider.
+if(!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, 0)) {
+    printf("Error %x during CryptAcquireContext!\n", GetLastError());
+    goto done;
+}
+
+// Read key blob length from file and allocate memory.
+fread(&dwBlobLen, sizeof(DWORD), 1, hSourceFile);
+
+pbKeyBlob = malloc(dwBlobLen);
+
+// Read key blob from file.
+fread(pbKeyBlob, 1, dwBlobLen, hSourceFile);
+
+// Import key blob into CSP.
+if(!CryptImportKey(hProv, pbKeyBlob, dwBlobLen, 0, 0, &hKey)) {
+    printf("Error %x during CryptImportKey!\n", GetLastError());
+    free(pbKeyBlob);
+    goto done;
+}
+
+// Free memory.
+free(pbKeyBlob);
+
+// Use 'hKey' to perform cryptographic operations.
+...
+ 
+done:
+
+// Destroy session key.
+if(hKey) CryptDestroyKey(hKey);
+
+// Release provider handle.
+if(hProv) CryptReleaseContext(hProv, 0);
+
+;=====================================================
+Example
+
+#include <wincrypt.h>
+  
+HCRYPTPROV hProv = 0;
+#define BUFFER_SIZE 256
+BYTE pbBuffer[BUFFER_SIZE];
+HCRYPTHASH hHash = 0;
+HCRYPTKEY hPubKey = 0;
+BYTE *pbSignature = NULL;
+DWORD dwSigLen;
+LPTSTR szDescription = NULL;
+
+// Get handle to the default provider.
+if(!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, 0)) {
+    printf("Error %x during CryptAcquireContext!\n", GetLastError());
+    goto done;
+}
+
+// Load 'pbBuffer' with 'BUFFER_SIZE' bytes of test data. This must
+
+// be the same data that was originally signed.
+...
+  
+// Point 'pbSignature' at the signature created by a previous call
+// to CryptSignHash. Set 'dwSigLen' to the number of bytes in the
+// signature.
+...
+  
+// Point 'szDescription' at some text describing the data being  
+// signed. This must be the same description text that was originally
+// passed to CryptSignHash.
+...
+ 
+// Get public key of the user that created the digital signature 
+// and import it into the CSP using CryptImportKey. This will return
+
+// a handle to the public key in 'hPubKey'.
+...
+  
+// Create hash object.
+if(!CryptCreateHash(hProv, CALG_MD5, 0, 0, &hHash)) {
+    printf("Error %x during CryptCreateHash!\n", GetLastError());
+    goto done;
+}
+
+// Hash buffer.
+if(!CryptHashData(hHash, pbBuffer, BUFFER_SIZE, 0)) {
+    printf("Error %x during CryptHashData!\n", GetLastError());
+    goto done;
+}
+
+// Validate digital signature.
+if(!CryptVerifySignature(hHash, pbSignature, dwSigLen, hPubKey, szDescription, 0)) {
+
+    if(GetLastError() == NTE_BAD_SIGNATURE) {
+        printf("Signature failed to validate!\n");
+    } else {
+        printf("Error %x during CryptSignHash!\n", GetLastError());
+    }
+} else {
+    printf("Signature validated OK\n");
+}
+    
+done:
+...
+
+// Release public key.
+if(hPubKey != 0) CryptDestroyKey(hPubKey);
+
+// Destroy hash object.
+if(hHash != 0) CryptDestroyHash(hHash);
+
+// Release provider handle.
+if(hProv != 0) CryptReleaseContext(hProv, 0);
+
+;===================
+
+
+case WM_TIMER:  
+  
+    switch (wParam) 
+{ 
+        case IDT_TIMER1: 
+            . 
+            . // Process the 10-second timer. 
+            . 
+ 
+             return 0; 
+ 
+        case IDT_TIMER2: 
+            . 
+            . // Process the 5-minute timer. 
+            . 
+ 
+            return 0; 
+    } 

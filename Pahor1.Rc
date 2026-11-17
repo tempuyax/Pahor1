@@ -1,0 +1,83 @@
+//includes all necessary resource definitions
+#include "Resource.h" 
+
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST DISCARDABLE "XpTheme.xml"
+
+// Icons ------------------------------------------------------------------------------------------
+ICON_APP_32  ICON DISCARDABLE "..\Icons\OA32.ICO"
+
+ICON_NEW     ICON DISCARDABLE "..\Icons\New_16x16_04.ico"
+ICON_OPEN    ICON DISCARDABLE "..\Icons\\ArrowGreen_16x16_04.ico"
+ICON_SAVE    ICON DISCARDABLE "..\Icons\Save_16x16_04.ico"
+ICON_EXIT    ICON DISCARDABLE "..\Icons\Exit_16x16_04.ico"
+
+ICON_HELP    ICON DISCARDABLE "..\Icons\HelpBook_16x16_04.ico"
+ICON_ABOUT   ICON DISCARDABLE "..\Icons\\Alert_16x16_04.ico"
+
+// Bitmaps ----------------------------------------------------------------------------------------
+BMP_BACKGROUND			BITMAP "..\Bmps\WndBkgnd.bmp"
+BMP_MENUSIDEBAR_1     	BITMAP "..\Bmps\OA32_Vert.bmp"
+
+// Dialogs ----------------------------------------------------------------------------------------
+// DialogAboutEx icons, cursor & resource template  
+ICON_IEXP             ICON DISCARDABLE "..\Icons\IE_16x16_08.ico"    ;Used by DialogAboutIndirect
+CURSOR_HAND           CURSOR DISCARDABLE "..\Cursors\Hand.cur"        ;Used by DialogAboutIndirect
+#include "..\Dialogs\DialogAbout.rc"
+
+// MENU IDs --------------------------------------------------------------------------------------------
+#define IDM_FILE    1000
+#define IDM_NEW	    1001
+#define IDM_OPEN	1002
+#define IDM_SAVE	1003
+#define IDM_EXIT    1004
+
+#define IDM_INFO    2000
+#define IDM_HELP    2001
+#define IDM_ASST    2002
+#define IDM_ABOUT	2003
+
+// Menus ------------------------------------------------------------------------------------------
+//  Keterangan:  MENUITEM "01$01", IDM_NEW, MFT_STRING, MFS_ENABLED
+//               00 menujukan urutan icon yg diload oleh imagelist, 01 sesuai IDmenu
+MENU_APP MENUEX DISCARDABLE
+BEGIN
+  POPUP "$01", IDM_FILE, MFT_STRING, MFS_ENABLED
+  BEGIN
+    MENUITEM "*|SB1|BMP_MENUSIDEBAR_1", 0, MFT_STRING, MFS_ENABLED
+    MENUITEM "-$00",         0, MFT_STRING, MFS_ENABLED
+    MENUITEM "00$02", IDM_NEW, MFT_STRING, MFS_ENABLED
+    MENUITEM "01$03", IDM_OPEN, MFT_STRING, MFS_ENABLED
+    MENUITEM "02$04", IDM_SAVE, MFT_STRING, MFS_ENABLED
+    MENUITEM "-$05",         0, MFT_STRING, MFS_ENABLED
+    MENUITEM "03$06", IDM_EXIT, MFT_STRING, MFS_ENABLED
+  END
+  POPUP "$10", IDM_INFO, MFT_STRING,   MFS_ENABLED
+  BEGIN
+    MENUITEM "04$11", IDM_HELP,  MFT_STRING, MFS_ENABLED
+    MENUITEM "#$12", IDM_ASST,  MFT_STRING, MFS_ENABLED
+    MENUITEM "05$13", IDM_ABOUT, MFT_STRING, MFS_ENABLED
+  END
+END
+
+// Stringtable ------------------------------------------------------------------------------------
+#define IDLANG_ENGLISH 000
+
+STRINGTABLE
+MOVEABLE PURE LOADONCALL DISCARDABLE
+BEGIN
+  IDLANG_ENGLISH + 00, "File App"
+  IDLANG_ENGLISH + 01, "&File|File commands"
+  IDLANG_ENGLISH + 02, "&New|Creates a new window"
+  IDLANG_ENGLISH + 03, "&Open|Open the active window"
+  IDLANG_ENGLISH + 04, "&Save|Saving File"
+  IDLANG_ENGLISH + 05, "Exits App"
+  IDLANG_ENGLISH + 06, "&Exit|Exits application"
+  
+  IDLANG_ENGLISH + 10, "&Info|General Information"
+  IDLANG_ENGLISH + 11, "&Help|Helper"
+  IDLANG_ENGLISH + 12, "a&Ssistant|Application Assistant"
+  IDLANG_ENGLISH + 13, "&About|App Copyright"
+END
+

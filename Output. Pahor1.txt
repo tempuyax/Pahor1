@@ -1,0 +1,58 @@
+:\Masm32\Bin\RC.EXE /v "pahor1.rc"
+Microsoft (R) Windows (R) Resource Compiler, Version 5.00.1823.1 - Build 1823
+
+Copyright (C) Microsoft Corp. 1985-1998. All rights reserved.
+
+
+Using codepage 1252 as default
+Creating pahor1.RES
+
+RC: RCPP -CP 1252 -f D:\masm32\ObjAsm32\Projects\Pahor1\RCa02828 -g D:\masm32\ObjAsm32\Projects\Pahor1\RDa02828 -DRC_INVOKED -D_WIN32 -pc\:/ -E -I. -I . -I D:\Masm32\ObjAsm32 -I D:\Masm32\ObjAsm32\Resources -I D:\Masm32\ObjAsm32\Resources\Dialogs
+
+pahor1.rc.
+Writing 24:1,	lang:0x0,	size 661.
+Writing ICON:1,	lang:0x0,	size 744
+Writing ICON:2,	lang:0x0,	size 296
+Writing ICON:3,	lang:0x0,	size 3752
+Writing ICON:4,	lang:0x0,	size 2216
+Writing ICON:5,	lang:0x0,	size 1384
+Writing ICON:6,	lang:0x0,	size 9640
+Writing ICON:7,	lang:0x0,	size 4264
+Writing ICON:8,	lang:0x0,	size 1128
+Writing GROUP_ICON:ICON_APP_32,	lang:0x0,	size 118.
+Writing BITMAP:BMP_BACKGROUND,	lang:0x0,	size 6504.
+Writing MENU:MENU_APP,	lang:0x0,	size 156
+
+Make finished.
+Total compile time 1547 ms
+d:\Masm32\Bin\ML.EXE /c /coff /Cp /nologo /I"d:\Masm32\Include" "pahor1.asm"
+ Assembling: pahor1.asm
+
+***********
+ASCII build
+***********
+
+STRING TYPE: ANSI
+DEBUG MODE : ACTIVE -> WND
+OOP LEVEL  : WINDOWS BASE
+- ObjIDs.inc
+- Primer.inc
+- Steamable.inc
+- WinPrimer.inc
+
+Inheritance path: Primer
+Inheritance path: Primer,Streamable
+Inheritance path: Primer,Streamable,WinPrimer
+Inheritance path: Primer,Streamable,WinPrimer,Dialog
+Inheritance path: Primer,Streamable,WinPrimer,Dialog,DialogModal
+Inheritance path: Primer,Streamable,WinPrimer,Dialog,DialogModal,DialogAbout
+Inheritance path: Primer,Streamable,WinPrimer,WinApp
+Inheritance path: Primer,Streamable,WinPrimer,WinApp,SdiApp
+Inheritance path: Primer,Streamable,WinPrimer,WinApp,SdiApp,Pahor1
+d:\Masm32\Bin\LINK.EXE /SUBSYSTEM:WINDOWS /RELEASE /VERSION:4.0 /LIBPATH:"d:\Masm32\Lib" /OUT:"pahor1.exe" "pahor1.obj" "pahor1.res"
+Microsoft (R) Incremental Linker Version 5.12.8078
+Copyright (C) Microsoft Corp 1992-1998. All rights reserved.
+
+
+Make finished.
+Total compile time 2687 ms
